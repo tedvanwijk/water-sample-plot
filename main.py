@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from datetime import datetime, timedelta
 
 def deleteString(val):
     try:
@@ -39,18 +40,25 @@ def loadData(originalData):
 
 def getDateIndices(dateList):
     date = dateList[0]
+    zeroDate = datetime.strptime(date, '%d-%m-%Y')
     dateIndex = 0
-    result = []
-    weekCount = 0
+    indices = []
+    days = []
     for i in range(len(dateList)):
         if dateList[i] != date and not pd.isnull(dateList[i]):
             # new date found
-            result.append((dateIndex, i))
+            indices.append((dateIndex, i))
             date = dateList[i]
+            dateItem = datetime.strptime(date, '%d-%m-%Y')
+            daysPassed = (dateItem - zeroDate).days
+            days.append(daysPassed)
             dateIndex = i
-            weekCount += 1
-    result.append((dateIndex, i + 1))
-    weekCount += 1
+    indices.append((dateIndex, i + 1))
+    indices.pop(0)
+    result = {
+        "Indices": indices,
+        "Days": days
+    }
     return result
 
 def plot(dataList, dataListNames, avg=True):
@@ -59,13 +67,14 @@ def plot(dataList, dataListNames, avg=True):
         plt.figure()
         for ii in range(len(dataList)):
             data = dataList[ii]
-            date = data['Date']
+            dateIndices = data['Date']["Indices"]
+            dateDays = data['Date']["Days"]
             ydata = np.array([])
             xdata = np.array([])
-            for i in range(len(data['Date'])):
+            for i in range(len(dateIndices)):
                 parameterData = data[p]['data']
                 # slicing
-                parameterData = parameterData[slice(*date[i])]
+                parameterData = parameterData[slice(*dateIndices[i])]
 
                 # remove strings and nan from data
                 parameterData = np.array([i for i in parameterData if deleteString(i)])
@@ -76,15 +85,15 @@ def plot(dataList, dataListNames, avg=True):
 
                 if avg:
                     ydata = np.append(ydata, np.average(parameterData))
-                    xdata = np.append(xdata, i + 1)
+                    xdata = np.append(xdata, dateDays[i])
                 else:
                     ydata = np.append(ydata, parameterData)
-                    xdata = np.append(xdata, np.ones(len(parameterData)) * (i + 1))
+                    xdata = np.append(xdata, np.ones(len(parameterData)) * dateDays[i])
 
             plt.scatter(xdata, ydata, label=dataListNames[ii])
             unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
-        plt.xlabel('Week # [-]')
+        plt.xlabel('Day# [-]')
         plt.title(f'{p}')
         plt.legend()
     return
