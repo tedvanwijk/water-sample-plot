@@ -4,13 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from datetime import datetime, timedelta
 from reference import importReferenceData
-
-def deleteString(val):
-    try:
-        x = float(val)
-    except:
-        return False
-    return True
+from plot import deleteString, plotAll, plotEff
 
 def loadData(originalData):
     data = {}
@@ -126,8 +120,8 @@ def plotData(fileName, referenceFileName):
     effData = loadData(eff)
     sluData = loadData(slu)
 
-    plot([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=False, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=True)
-
+    # plotAll([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=False, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=True)
+    plotEff(effData, avg=False, refData=[refEffData, refBluData], refLabels=['Effluent ref', 'BE ref'], ref=True)
     plt.show()
 
 if __name__ == "__main__":
