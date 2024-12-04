@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from datetime import datetime, timedelta
+from reference import importReferenceData
 
 def deleteString(val):
     try:
@@ -61,7 +62,7 @@ def getDateIndices(dateList):
     }
     return result
 
-def plot(dataList, dataListNames, avg=True):
+def plot(dataList, dataListNames, avg=True, refData=[], refLabels = [], ref=False):
     parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrate total', 'Turbidity']
     for p in parameters:
         plt.figure()
@@ -94,13 +95,28 @@ def plot(dataList, dataListNames, avg=True):
             unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
         plt.xlabel('Day# [-]')
+
+        if ref:
+            for i in range(len(refData)):
+                data = refData[i]
+                label = refLabels[i]
+                if p not in data:
+                    continue
+                ydata = data[p]['data']
+                xdata = data['Date']['Days']
+                plt.scatter(xdata, ydata, label=label, marker='x')
+
         plt.title(f'{p}')
         plt.legend()
     return
 
-def plotData(fileName):
+def plotData(fileName, referenceFileName):
     path = os.path.join('data', fileName)
     df = pd.read_excel(path, engine='odf', sheet_name=['Influent Measurements', 'Effluent Measurements', 'Sludge Measurements'])
+
+    referencePath = os.path.join('data', referenceFileName)
+    referenceDf = pd.read_excel(referencePath, sheet_name='Blad1', header=None)
+    refInfData, refEffData, refBluData = importReferenceData(referenceDf)
     
     inf = df['Influent Measurements']
     eff = df['Effluent Measurements']
@@ -110,10 +126,11 @@ def plotData(fileName):
     effData = loadData(eff)
     sluData = loadData(slu)
 
-    plot([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=False)
+    plot([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=False, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=True)
 
     plt.show()
 
 if __name__ == "__main__":
-    fileName = '20241023.ods'
-    plotData(fileName)
+    fileName = 'Sample measurements (9).ods'
+    referenceFileName = 'reference.xlsx'
+    plotData(fileName, referenceFileName)
