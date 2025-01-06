@@ -9,7 +9,7 @@ from plot import deleteString, plotAll, plotEff, plotDiff
 def loadData(originalData):
     data = {}
     # parameters to be plotted
-    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrate total', 'Turbidity']
+    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
 
     for p in parameters:
         headerForParameter = p
@@ -78,6 +78,6 @@ def plotData(fileName, referenceFileName):
     plt.show()
 
 if __name__ == "__main__":
-    fileName = 'Sample measurements (10).ods'
+    fileName = 'Sample measurements (12).ods'
     referenceFileName = 'reference.xlsx'
     plotData(fileName, referenceFileName)
