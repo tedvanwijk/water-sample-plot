@@ -10,7 +10,7 @@ def deleteString(val):
     return True
 
 def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=False):
-    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrate total', 'Turbidity']
+    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
     for p in parameters:
         plt.figure()
         for ii in range(len(dataList)):
@@ -58,7 +58,7 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
     return
 
 def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
-    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrate total', 'Turbidity']
+    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
     # https://wetten.overheid.nl/BWBR0041313/2024-07-01#BijlageV
     limits = ['<1.5', '<0.9', None, None, None, '7-9', '<50', None]
     for ii in range(len(parameters)):
@@ -124,7 +124,7 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
 
 def plotDiff(infData, effData):
     # parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrate total', 'Turbidity']
-    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Nitrate total', 'Turbidity']
+    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Nitrogen total', 'Turbidity']
     dateIndicesInf = infData['Date']["Indices"]
     dateDaysInf = infData['Date']["Days"]
     dateIndicesEff = effData['Date']["Indices"]
