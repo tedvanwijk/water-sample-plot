@@ -120,5 +120,53 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
         plt.title(f'{p}: Effluent data')
         plt.legend()
 
-        
     return
+
+def plotDiff(infData, effData):
+    # parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrate total', 'Turbidity']
+    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Nitrate total', 'Turbidity']
+    dateIndicesInf = infData['Date']["Indices"]
+    dateDaysInf = infData['Date']["Days"]
+    dateIndicesEff = effData['Date']["Indices"]
+    dateDaysEff = effData['Date']["Days"]
+    dateIndicesLoop = dateIndicesInf
+    if len(dateIndicesEff) > len(dateIndicesInf):
+        dateIndicesLoop = dateIndicesEff
+    
+    plt.figure()
+    for i in range(len(parameters)):
+        p = parameters[i]
+        ydata = np.array([])
+        xdata = np.array([])
+        for i in range(len(dateIndicesLoop)):
+            parameterDataInf = infData[p]['data']
+            parameterDataEff = effData[p]['data']
+            # slicing
+            parameterDataInf = parameterDataInf[slice(*dateIndicesLoop[i])]
+            parameterDataEff = parameterDataEff[slice(*dateIndicesLoop[i])]
+
+            # remove strings and nan from data
+            parameterDataInf = np.array([i for i in parameterDataInf if deleteString(i)])
+            parameterDataInf = np.array(parameterDataInf)
+            parameterDataInf = np.delete(parameterDataInf, np.where(pd.isnull(parameterDataInf)))
+            if len(parameterDataInf) == 0:
+                continue
+
+            parameterDataEff = np.array([i for i in parameterDataEff if deleteString(i)])
+            parameterDataEff = np.array(parameterDataEff)
+            parameterDataEff = np.delete(parameterDataEff, np.where(pd.isnull(parameterDataEff)))
+            if len(parameterDataEff) == 0:
+                continue
+
+            effAvg = np.average(parameterDataEff)
+            infAvg = np.average(parameterDataInf)
+            # diff = (infAvg - effAvg) / infAvg * 100
+            diff = effAvg / infAvg * 100
+
+            ydata = np.append(ydata, diff)
+            xdata = np.append(xdata, dateDaysInf[i])
+        plt.scatter(xdata, ydata, label=p)
+    plt.legend()
+    plt.xlabel('Days [-]')
+    plt.ylabel('Reduction [%]')
+    plt.title('Percentage reduction from influent to effluent')
