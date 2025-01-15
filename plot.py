@@ -9,6 +9,136 @@ def deleteString(val):
         return False
     return True
 
+parameterData = {
+    "Influent": {
+        "Ammonium": {
+            "min": 100,
+            "max": 1800
+        },
+        "Ortho Phosphate": {
+            "min": 1.6,
+            "max": 30
+        },
+        "COD": {
+            "min": 0,
+            "max": 1000
+        },
+        "BOD": {
+            "min": 4,
+            "max": 1650
+        },
+        "Conductivity": {
+            "min": -1,
+            "max": -1
+        },
+        "pH": {
+            "min": -1,
+            "max": -1
+        },
+        "Nitrogen total": {
+            "min": 20,
+            "max": 100
+        },
+        "Turbidity": {
+            "min": -1,
+            "max": -1
+        }
+    },
+    "Effluent": {
+        "Ammonium": {
+            "min": 1,
+            "max": 12
+        },
+        "Ortho Phosphate": {
+            "min": 1.6,
+            "max": 30
+        },
+        "COD": {
+            "min": 0,
+            "max": 1000
+        },
+        "BOD": {
+            "min": 4,
+            "max": 1650
+        },
+        "Conductivity": {
+            "min": -1,
+            "max": -1
+        },
+        "pH": {
+            "min": -1,
+            "max": -1
+        },
+        "Nitrogen total": {
+            "min": 20,
+            "max": 100
+        },
+        "Turbidity": {
+            "min": -1,
+            "max": -1
+        }
+    },
+    "Sludge": {
+        "Ammonium": {
+            "min": 1,
+            "max": 12
+        },
+        "Ortho Phosphate": {
+            "min": 1.6,
+            "max": 30
+        },
+        "COD": {
+            "min": 0,
+            "max": 1000
+        },
+        "BOD": {
+            "min": 4,
+            "max": 1650
+        },
+        "Conductivity": {
+            "min": -1,
+            "max": -1
+        },
+        "pH": {
+            "min": -1,
+            "max": -1
+        },
+        "Nitrogen total": {
+            "min": 20,
+            "max": 100
+        },
+        "Turbidity": {
+            "min": -1,
+            "max": -1
+        }
+    },
+}
+
+colors = {
+    "Influent": "tab:blue",
+    "Effluent": "tab:orange",
+    "Sludge": "tab:green",
+    "Influent ref": "tab:red",
+    "Effluent ref": "tab:purple",
+    "BE ref": "tab:brown"
+}
+
+def checkDataValidity(dataType, parameter, values):
+    for value in values:
+        if value < 0:
+            return 'invalid'
+        
+        minValue = parameterData[dataType][parameter]['min']
+        maxValue = parameterData[dataType][parameter]['max']
+
+        if minValue == -1 and maxValue == -1:
+            continue
+
+        if float(value) > maxValue or float(value) < minValue:
+            return 'outOfRange'
+        
+    return 'valid'
+
 def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=False):
     parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
     for p in parameters:
@@ -19,6 +149,12 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
             dateDays = data['Date']["Days"]
             ydata = np.array([])
             xdata = np.array([])
+
+            ydataOutOfRange = np.array([])
+            xdataOutOfRange = np.array([])
+
+            ydataInvalid = np.array([])
+            xdataInvalid = np.array([])
             for i in range(len(dateIndices)):
                 parameterData = data[p]['data']
                 # slicing
@@ -31,15 +167,30 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
                 if len(parameterData) == 0:
                     continue
 
-                if avg:
-                    ydata = np.append(ydata, np.average(parameterData))
-                    xdata = np.append(xdata, dateDays[i])
-                else:
-                    ydata = np.append(ydata, parameterData)
-                    xdata = np.append(xdata, np.ones(len(parameterData)) * dateDays[i])
+                newYValue = parameterData
+                newXValue = np.ones(len(parameterData)) * dateDays[i]
 
-            plt.scatter(xdata, ydata, label=dataListNames[ii])
-            unit = data[p]['unit']
+                dataValid = checkDataValidity(dataListNames[ii], p, newYValue)
+                
+                if avg:
+                    newYValue = np.average(parameterData)
+                    newXValue = dateDays[i]
+
+                if dataValid == 'invalid':
+                    newYValue *= -1
+                    xdataInvalid = np.append(xdataInvalid, newXValue)
+                    ydataInvalid = np.append(ydataInvalid, newYValue)
+                elif dataValid == 'outOfRange':
+                    xdataOutOfRange = np.append(xdataOutOfRange, newXValue)
+                    ydataOutOfRange = np.append(ydataOutOfRange, newYValue)
+                else:
+                    xdata = np.append(xdata, newXValue)
+                    ydata = np.append(ydata, newYValue)
+
+            plt.scatter(xdata, ydata, label=dataListNames[ii], c=colors[dataListNames[ii]])
+            plt.scatter(xdataOutOfRange, ydataOutOfRange, label=f'{dataListNames[ii]} (out of range)', marker='2', c=colors[dataListNames[ii]])
+            plt.scatter(xdataInvalid, ydataInvalid, label=f'{dataListNames[ii]} (invalid)', marker='x', c=colors[dataListNames[ii]])
+        unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
         plt.xlabel('Day# [-]')
 
@@ -51,7 +202,7 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
                     continue
                 ydata = data[p]['data']
                 xdata = data['Date']['Days']
-                plt.scatter(xdata, ydata, label=label, marker='x')
+                plt.scatter(xdata, ydata, label=label, c=colors[label])
 
         plt.title(f'{p}')
         plt.legend()
@@ -69,6 +220,14 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
         dateDays = data['Date']["Days"]
         ydata = np.array([])
         xdata = np.array([])
+
+        ydataOutOfRange = np.array([])
+        xdataOutOfRange = np.array([])
+
+        ydataInvalid = np.array([])
+        xdataInvalid = np.array([])
+
+        xdataTotal = np.array([])
         for i in range(len(dateIndices)):
             parameterData = data[p]['data']
             # slicing
@@ -81,13 +240,31 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
             if len(parameterData) == 0:
                 continue
 
+            newYValue = parameterData
+            newXValue = np.ones(len(parameterData)) * dateDays[i]
+
+            dataValid = checkDataValidity('Effluent', p, newYValue)
+
             if avg:
-                ydata = np.append(ydata, np.average(parameterData))
-                xdata = np.append(xdata, dateDays[i])
+                newYValue = np.average(parameterData)
+                newXValue = dateDays[i]
+
+            if dataValid == 'invalid':
+                newYValue *= -1
+                xdataInvalid = np.append(xdataInvalid, newXValue)
+                ydataInvalid = np.append(ydataInvalid, newYValue)
+            elif dataValid == 'outOfRange':
+                xdataOutOfRange = np.append(xdataOutOfRange, newXValue)
+                ydataOutOfRange = np.append(ydataOutOfRange, newYValue)
             else:
-                ydata = np.append(ydata, parameterData)
-                xdata = np.append(xdata, np.ones(len(parameterData)) * dateDays[i])
-        plt.scatter(xdata, ydata, label='Effluent Saxion')
+                xdata = np.append(xdata, newXValue)
+                ydata = np.append(ydata, newYValue)
+
+            xdataTotal = np.append(xdataTotal, newXValue)
+
+        plt.scatter(xdata, ydata, label='Effluent Saxion', c=colors['Effluent'])
+        plt.scatter(xdataOutOfRange, ydataOutOfRange, label='Effluent Saxion (out of range)', marker='2', c=colors['Effluent'])
+        plt.scatter(xdataInvalid, ydataInvalid, label='Effluent Saxion (invalid)', marker='x', c=colors['Effluent'])
         unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
         plt.xlabel('Day# [-]')
@@ -101,14 +278,14 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
                     continue
                 ydataRef = data[p]['data']
                 xdataRef = data['Date']['Days']
-                plt.scatter(xdataRef, ydataRef, label=label, marker='x')
+                plt.scatter(xdataRef, ydataRef, label=label, c=colors[label])
 
         limitValue = limits[ii]
         if limitValue != None:
-            if (len(xdataRef) > len(xdata)):
+            if len(xdataRef) > xdata.shape[0]:
                 xdataLimit = xdataRef
             else:
-                xdataLimit = xdata
+                xdataLimit = xdataTotal
             if limitValue[0] == '<':
                 plt.fill_between(x=xdataLimit, y1=0, y2=float(limitValue[1:]), color='green', alpha=0.25)
             elif limitValue[0] == '>':
@@ -130,17 +307,22 @@ def plotDiff(infData, effData):
     dateIndicesEff = effData['Date']["Indices"]
     dateDaysEff = effData['Date']["Days"]
     dateIndicesLoop = dateIndicesInf
+    dateDaysLoop = dateDaysInf
+
+    barWidth = 0.15
+    xdataLong = []
+
     if len(dateIndicesEff) > len(dateIndicesInf):
         dateIndicesLoop = dateIndicesEff
-    
+        dateDaysLoop = dateDaysEff
     plt.figure()
-    for i in range(len(parameters)):
-        p = parameters[i]
+    for p in range(len(parameters)):
+        parameter = parameters[p]
         ydata = np.array([])
         xdata = np.array([])
         for i in range(len(dateIndicesLoop)):
-            parameterDataInf = infData[p]['data']
-            parameterDataEff = effData[p]['data']
+            parameterDataInf = infData[parameter]['data']
+            parameterDataEff = effData[parameter]['data']
             # slicing
             parameterDataInf = parameterDataInf[slice(*dateIndicesLoop[i])]
             parameterDataEff = parameterDataEff[slice(*dateIndicesLoop[i])]
@@ -149,24 +331,36 @@ def plotDiff(infData, effData):
             parameterDataInf = np.array([i for i in parameterDataInf if deleteString(i)])
             parameterDataInf = np.array(parameterDataInf)
             parameterDataInf = np.delete(parameterDataInf, np.where(pd.isnull(parameterDataInf)))
-            if len(parameterDataInf) == 0:
-                continue
 
             parameterDataEff = np.array([i for i in parameterDataEff if deleteString(i)])
             parameterDataEff = np.array(parameterDataEff)
             parameterDataEff = np.delete(parameterDataEff, np.where(pd.isnull(parameterDataEff)))
-            if len(parameterDataEff) == 0:
-                continue
 
-            effAvg = np.average(parameterDataEff)
-            infAvg = np.average(parameterDataInf)
-            # diff = (infAvg - effAvg) / infAvg * 100
-            diff = effAvg / infAvg * 100
+            if len(parameterDataInf) == 0 or len(parameterDataEff) ==0:
+                # either inf or eff data missing for this day. Still have to plot so we don't mess up axis data
+                diff = 0
+                xvalue = 0
+            else:
+                infAvg = np.average(parameterDataInf)
+                effAvg = np.average(parameterDataEff)
+                diff = effAvg / infAvg * 100
+                if diff > 100:
+                    diff = 0
+                xvalue = dateDaysInf[i]
 
             ydata = np.append(ydata, diff)
-            xdata = np.append(xdata, dateDaysInf[i])
-        plt.scatter(xdata, ydata, label=p)
+            xdata = np.append(xdata, xvalue)
+
+        xdataPlot = np.arange(len(xdata))
+        xdataPlot = [e + p * barWidth for e in xdataPlot]
+        plt.bar(xdataPlot, ydata, label=parameter, width=barWidth)
     plt.legend()
-    plt.xlabel('Days [-]')
-    plt.ylabel('Reduction [%]')
-    plt.title('Percentage reduction from influent to effluent')
+    plt.xlabel('Days since startup [-]')
+    plt.ylabel('Remnant [%]')
+    plt.xticks([r + (p / 2) * barWidth for r in np.arange(len(dateDaysLoop))],
+        dateDaysLoop)
+    plt.title(f'Remnant in effluent compared to influent. Remnant = 0 corresponds to no data')
+
+    for i in range(len(dateDaysLoop) + 1):
+        i = i - 1
+        plt.axvline(x = (i + (p / 2) * barWidth + 0.5), color='k', linestyle=':')

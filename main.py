@@ -72,12 +72,13 @@ def plotData(fileName, referenceFileName):
     effData = loadData(eff)
     sluData = loadData(slu)
 
-    # plotAll([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=False, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=True)
-    # plotEff(effData, avg=False, refData=[refEffData, refBluData], refLabels=['Effluent ref', 'BE ref'], ref=True)
-    plotDiff(infData, effData)
+    # plotAll([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=True, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=False)
+    # plotAll([infData, effData], ['Influent', 'Effluent'], avg=True, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=False)
+    plotEff(effData, avg=False, refData=[refEffData, refBluData], refLabels=['Effluent ref', 'BE ref'], ref=True)
+    # plotDiff(infData, effData)
     plt.show()
 
 if __name__ == "__main__":
-    fileName = 'Sample measurements (12).ods'
+    fileName = 'Sample measurements (18).ods'
     referenceFileName = 'reference.xlsx'
     plotData(fileName, referenceFileName)
