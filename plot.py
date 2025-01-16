@@ -316,7 +316,6 @@ def plotDiff(infData, effData):
     dateDaysLoop = dateDaysInf
 
     barWidth = 0.15
-    xdataLong = []
 
     if len(dateIndicesEff) > len(dateIndicesInf):
         dateIndicesLoop = dateIndicesEff
@@ -349,7 +348,7 @@ def plotDiff(infData, effData):
             else:
                 infAvg = np.average(parameterDataInf)
                 effAvg = np.average(parameterDataEff)
-                diff = effAvg / infAvg * 100
+                diff = np.abs(effAvg / infAvg * 100)
                 if diff > 100:
                     diff = 0
                 xvalue = dateDaysInf[i]
