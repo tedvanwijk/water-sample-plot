@@ -73,9 +73,9 @@ def plotData(fileName, referenceFileName):
     sluData = loadData(slu)
 
     # plotAll([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=True, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=False)
-    # plotAll([infData, effData], ['Influent', 'Effluent'], avg=True, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=False)
-    plotEff(effData, avg=False, refData=[refEffData, refBluData], refLabels=['Effluent ref', 'BE ref'], ref=True)
-    # plotDiff(infData, effData)
+    plotAll([infData, effData], ['Influent', 'Effluent', 'Sludge'], avg=True, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=False)
+    plotEff(effData, avg=False, refData=[refEffData, refBluData], refLabels=['Effluent ref', 'BE ref'], ref=False)
+    plotDiff(infData, effData)
     plt.show()
 
 if __name__ == "__main__":

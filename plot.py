@@ -187,9 +187,12 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
                     xdata = np.append(xdata, newXValue)
                     ydata = np.append(ydata, newYValue)
 
-            plt.scatter(xdata, ydata, label=dataListNames[ii], c=colors[dataListNames[ii]])
-            plt.scatter(xdataOutOfRange, ydataOutOfRange, label=f'{dataListNames[ii]} (out of range)', marker='2', c=colors[dataListNames[ii]])
-            plt.scatter(xdataInvalid, ydataInvalid, label=f'{dataListNames[ii]} (invalid)', marker='x', c=colors[dataListNames[ii]])
+            if len(xdata) != 0:
+                plt.scatter(xdata, ydata, label=dataListNames[ii], c=colors[dataListNames[ii]])
+            if len(xdataOutOfRange) != 0:
+                plt.scatter(xdataOutOfRange, ydataOutOfRange, label=f'{dataListNames[ii]} (out of range)', marker='2', c=colors[dataListNames[ii]])
+            if len(xdataInvalid) != 0:
+                plt.scatter(xdataInvalid, ydataInvalid, label=f'{dataListNames[ii]} (invalid)', marker='x', c=colors[dataListNames[ii]])
         unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
         plt.xlabel('Day# [-]')
@@ -262,9 +265,12 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
 
             xdataTotal = np.append(xdataTotal, newXValue)
 
-        plt.scatter(xdata, ydata, label='Effluent Saxion', c=colors['Effluent'])
-        plt.scatter(xdataOutOfRange, ydataOutOfRange, label='Effluent Saxion (out of range)', marker='2', c=colors['Effluent'])
-        plt.scatter(xdataInvalid, ydataInvalid, label='Effluent Saxion (invalid)', marker='x', c=colors['Effluent'])
+        if len(xdata) != 0:
+            plt.scatter(xdata, ydata, label='Effluent Saxion', c=colors['Effluent'])
+        if len(xdataOutOfRange) != 0:
+            plt.scatter(xdataOutOfRange, ydataOutOfRange, label='Effluent Saxion (out of range)', marker='2', c=colors['Effluent'])
+        if len(xdataInvalid) != 0:
+            plt.scatter(xdataInvalid, ydataInvalid, label='Effluent Saxion (invalid)', marker='x', c=colors['Effluent'])
         unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
         plt.xlabel('Day# [-]')
