@@ -73,8 +73,8 @@ def plotData(fileName, referenceFileName):
     sluData = loadData(slu)
 
     # plotAll([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=True, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=False)
-    plotAll([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=False, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=False, plotLimits=True)
-    plotEff(effData, avg=False, refData=[refEffData, refBluData], refLabels=['Effluent ref', 'BE ref'], ref=False)
+    plotAll([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=False, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=False, refColors=['tab:red', 'tab:purple', 'tab:brown'], plotLimits=True)
+    plotEff(effData, avg=False, refData=[refEffData, refBluData], refLabels=['Effluent de Sumpel', 'Effluent BluElephant de Sumpel'], ref=True, refColors=['tab:purple', 'tab:brown'])
     plotDiff(infData, effData)
     plt.show()
 

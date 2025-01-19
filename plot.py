@@ -139,7 +139,7 @@ def checkDataValidity(dataType, parameter, values):
         
     return 'valid'
 
-def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=False, plotLimits=False):
+def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=False, refColors=[], plotLimits=False):
     parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
     limits = ['<1.5', '<0.9', None, None, None, '7-9', '<50', None]
     for iii in range(len(parameters)):
@@ -212,7 +212,7 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
                     continue
                 ydataRef = data[p]['data']
                 xdataRef = data['Date']['Days']
-                plt.scatter(xdataRef, ydataRef, label=label, c=colors[label])
+                plt.scatter(xdataRef, ydataRef, label=label, c=refColors[i])
 
         limitValue = limits[iii]
         if limitValue != None and plotLimits:
@@ -232,7 +232,7 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
         plt.legend()
     return
 
-def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
+def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False, refColors=[]):
     parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
     # https://wetten.overheid.nl/BWBR0041313/2024-07-01#BijlageV
     limits = ['<1.5', '<0.9', None, None, None, '7-9', '<50', None]
@@ -305,7 +305,7 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
                     continue
                 ydataRef = data[p]['data']
                 xdataRef = data['Date']['Days']
-                plt.scatter(xdataRef, ydataRef, label=label, c=colors[label])
+                plt.scatter(xdataRef, ydataRef, label=label, c=refColors[i])
 
         limitValue = limits[ii]
         if limitValue != None:
@@ -385,7 +385,7 @@ def plotDiff(infData, effData):
     plt.ylabel('Remnant [%]')
     plt.xticks([r + (p / 2) * barWidth for r in np.arange(len(dateDaysLoop))],
         dateDaysLoop)
-    plt.title(f'Remnant in effluent compared to influent. Remnant = 0 corresponds to no data')
+    plt.title(f'Remnant in effluent compared to influent. Remnant = 0 corresponds to invalid data')
 
     for i in range(len(dateDaysLoop) + 1):
         i = i - 1
