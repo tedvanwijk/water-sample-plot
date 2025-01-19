@@ -386,6 +386,7 @@ def plotDiff(infData, effData):
     plt.xticks([r + (p / 2) * barWidth for r in np.arange(len(dateDaysLoop))],
         dateDaysLoop)
     plt.title(f'Remnant in effluent compared to influent. Remnant = 0 corresponds to invalid data')
+    plt.grid(axis='y')
 
     for i in range(len(dateDaysLoop) + 1):
         i = i - 1
