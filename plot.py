@@ -139,9 +139,11 @@ def checkDataValidity(dataType, parameter, values):
         
     return 'valid'
 
-def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=False):
+def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=False, plotLimits=False):
     parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
-    for p in parameters:
+    limits = ['<1.5', '<0.9', None, None, None, '7-9', '<50', None]
+    for iii in range(len(parameters)):
+        p = parameters[iii]
         plt.figure()
         for ii in range(len(dataList)):
             data = dataList[ii]
@@ -155,6 +157,8 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
 
             ydataInvalid = np.array([])
             xdataInvalid = np.array([])
+
+            xdataTotal = np.array([])
             for i in range(len(dateIndices)):
                 parameterData = data[p]['data']
                 # slicing
@@ -187,6 +191,8 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
                     xdata = np.append(xdata, newXValue)
                     ydata = np.append(ydata, newYValue)
 
+                xdataTotal = np.append(xdataTotal, newXValue)
+
             if len(xdata) != 0:
                 plt.scatter(xdata, ydata, label=dataListNames[ii], c=colors[dataListNames[ii]])
             if len(xdataOutOfRange) != 0:
@@ -197,15 +203,30 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
         plt.ylabel(f'{p} {unit}')
         plt.xlabel('Days since BE startup [-]')
 
+        xdataRef = np.array([])
         if ref:
             for i in range(len(refData)):
                 data = refData[i]
                 label = refLabels[i]
                 if p not in data:
                     continue
-                ydata = data[p]['data']
-                xdata = data['Date']['Days']
-                plt.scatter(xdata, ydata, label=label, c=colors[label])
+                ydataRef = data[p]['data']
+                xdataRef = data['Date']['Days']
+                plt.scatter(xdataRef, ydataRef, label=label, c=colors[label])
+
+        limitValue = limits[iii]
+        if limitValue != None and plotLimits:
+            if len(xdataRef) > len(xdataTotal):
+                xdataLimit = xdataRef
+            else:
+                xdataLimit = xdataTotal
+            if limitValue[0] == '<':
+                plt.fill_between(x=xdataLimit, y1=0, y2=float(limitValue[1:]), color='green', alpha=0.25)
+            elif limitValue[0] == '>':
+                plt.fill_between(x=xdataLimit, y1=float(limitValue[1:]), y2=np.max(ydata), color='green', alpha=0.25)
+            else:
+                # limitValue is min-max
+                plt.fill_between(x=xdataLimit, y1=float(limitValue.split('-')[0]), y2=float(limitValue.split('-')[1]), color='green', alpha=0.25)
 
         plt.title(f'{p}')
         plt.legend()
