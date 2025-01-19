@@ -190,12 +190,12 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
             if len(xdata) != 0:
                 plt.scatter(xdata, ydata, label=dataListNames[ii], c=colors[dataListNames[ii]])
             if len(xdataOutOfRange) != 0:
-                plt.scatter(xdataOutOfRange, ydataOutOfRange, label=f'{dataListNames[ii]} (out of range)', marker='2', c=colors[dataListNames[ii]])
+                plt.scatter(xdataOutOfRange, ydataOutOfRange, label=f'{dataListNames[ii]} (out of range)', marker='^', c=colors[dataListNames[ii]])
             if len(xdataInvalid) != 0:
                 plt.scatter(xdataInvalid, ydataInvalid, label=f'{dataListNames[ii]} (invalid)', marker='x', c=colors[dataListNames[ii]])
         unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
-        plt.xlabel('Day# [-]')
+        plt.xlabel('Days since BE startup [-]')
 
         if ref:
             for i in range(len(refData)):
@@ -268,12 +268,12 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False):
         if len(xdata) != 0:
             plt.scatter(xdata, ydata, label='Effluent Saxion', c=colors['Effluent'])
         if len(xdataOutOfRange) != 0:
-            plt.scatter(xdataOutOfRange, ydataOutOfRange, label='Effluent Saxion (out of range)', marker='2', c=colors['Effluent'])
+            plt.scatter(xdataOutOfRange, ydataOutOfRange, label='Effluent Saxion (out of range)', marker='^', c=colors['Effluent'])
         if len(xdataInvalid) != 0:
             plt.scatter(xdataInvalid, ydataInvalid, label='Effluent Saxion (invalid)', marker='x', c=colors['Effluent'])
         unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
-        plt.xlabel('Day# [-]')
+        plt.xlabel('Days since BE startup [-]')
 
         xdataRef = np.array([])
         if ref:
@@ -360,7 +360,7 @@ def plotDiff(infData, effData):
         xdataPlot = [e + p * barWidth for e in xdataPlot]
         plt.bar(xdataPlot, ydata, label=parameter, width=barWidth)
     plt.legend()
-    plt.xlabel('Days since startup [-]')
+    plt.xlabel('Days since BE startup [-]')
     plt.ylabel('Remnant [%]')
     plt.xticks([r + (p / 2) * barWidth for r in np.arange(len(dateDaysLoop))],
         dateDaysLoop)
