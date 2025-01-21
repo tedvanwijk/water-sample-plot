@@ -92,6 +92,7 @@ if __name__ == "__main__":
         ref=True, 
         refColors=['tab:red', 'tab:purple', 'tab:brown'], 
         plotLimits=True,
+        limits=['<1.5', '<0.9', None, None, None, '7-9', '<50', None],
         parameters=['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
         )
     

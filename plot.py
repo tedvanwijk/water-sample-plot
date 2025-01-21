@@ -130,8 +130,7 @@ def checkDataValidity(dataType, parameter, values):
         
     return 'valid'
 
-def plotAll(dataList, dataListNames, colors=['tab:blue', 'tab:orange', 'tab:green'], avg=True, refData=[], refLabels=[], ref=False, refColors=[], plotLimits=False, parameters=[]):
-    limits = ['<1.5', '<0.9', None, None, None, '7-9', '<50', None]
+def plotAll(dataList, dataListNames, colors=['tab:blue', 'tab:orange', 'tab:green'], avg=True, refData=[], refLabels=[], ref=False, refColors=[], plotLimits=False, parameters=[], limits=[]):
     for iii in range(len(parameters)):
         p = parameters[iii]
         plt.figure()
@@ -204,19 +203,20 @@ def plotAll(dataList, dataListNames, colors=['tab:blue', 'tab:orange', 'tab:gree
                 xdataRef = data['Date']['Days']
                 plt.scatter(xdataRef, ydataRef, label=label, c=refColors[i])
 
-        limitValue = limits[iii]
-        if limitValue != None and plotLimits:
-            if len(xdataRef) > 0 and xdataRef[-1] > xdataTotal[-1]:
-                xdataLimit = xdataRef
-            else:
-                xdataLimit = xdataTotal
-            if limitValue[0] == '<':
-                plt.fill_between(x=xdataLimit, y1=0, y2=float(limitValue[1:]), color='green', alpha=0.25)
-            elif limitValue[0] == '>':
-                plt.fill_between(x=xdataLimit, y1=float(limitValue[1:]), y2=np.max(ydata), color='green', alpha=0.25)
-            else:
-                # limitValue is min-max
-                plt.fill_between(x=xdataLimit, y1=float(limitValue.split('-')[0]), y2=float(limitValue.split('-')[1]), color='green', alpha=0.25)
+        if iii < len(limits):
+            limitValue = limits[iii]
+            if limitValue != None and plotLimits:
+                if len(xdataRef) > 0 and xdataRef[-1] > xdataTotal[-1]:
+                    xdataLimit = xdataRef
+                else:
+                    xdataLimit = xdataTotal
+                if limitValue[0] == '<':
+                    plt.fill_between(x=xdataLimit, y1=0, y2=float(limitValue[1:]), color='green', alpha=0.25)
+                elif limitValue[0] == '>':
+                    plt.fill_between(x=xdataLimit, y1=float(limitValue[1:]), y2=np.max(ydata), color='green', alpha=0.25)
+                else:
+                    # limitValue is min-max
+                    plt.fill_between(x=xdataLimit, y1=float(limitValue.split('-')[0]), y2=float(limitValue.split('-')[1]), color='green', alpha=0.25)
 
         plt.title(f'{p}')
         plt.legend()
