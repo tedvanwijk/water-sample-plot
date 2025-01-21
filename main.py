@@ -9,6 +9,7 @@ from plot import deleteString, plotAll, plotEff, plotDiff
 class Plotter:
     def __init__(self):
         super(Plotter, self).__init__()
+        self.parameters = []
 
     def loadData(self, fileName, sheetName):
         path = os.path.join('data', fileName)
@@ -16,9 +17,8 @@ class Plotter:
 
         data = {}
         # parameters to be plotted
-        parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
 
-        for p in parameters:
+        for p in self.parameters:
             headerForParameter = p
             for header in df.columns:
                 trimmedHeader = header[0:len(p)]
@@ -75,14 +75,30 @@ if __name__ == "__main__":
     fileName = 'Sample measurements (18).ods'
     referenceFileName = 'reference.xlsx'
 
+    plotter.parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
     infData = plotter.loadData(fileName, 'Influent Measurements')
     effData = plotter.loadData(fileName, 'Effluent Measurements')
     sluData = plotter.loadData(fileName, 'Sludge Measurements')
 
     refInfData, refEffData, refBluData = plotter.loadReferenceData(referenceFileName, 'Blad1')
 
-    plotAll([infData, effData, sluData], ['Influent', 'Effluent', 'Sludge'], avg=False, refData=[refInfData, refEffData, refBluData], refLabels=['Influent ref', 'Effluent ref', 'BE ref'], ref=False, refColors=['tab:red', 'tab:purple', 'tab:brown'], plotLimits=True)
-    plotEff(effData, avg=False, refData=[refEffData, refBluData], refLabels=['Effluent de Sumpel', 'Effluent BluElephant de Sumpel'], ref=True, refColors=['tab:purple', 'tab:brown'])
-    plotDiff(infData, effData)
+    plotAll(
+        [infData, effData, sluData], 
+        ['Influent', 'Effluent', 'Sludge'], 
+        colors=['tab:blue', 'tab:orange', 'tab:green'],
+        avg=False, 
+        refData=[refInfData, refEffData, refBluData], 
+        refLabels=['Influent ref', 'Effluent ref', 'BE ref'], 
+        ref=True, 
+        refColors=['tab:red', 'tab:purple', 'tab:brown'], 
+        plotLimits=True,
+        parameters=['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
+        )
+    
+    plotDiff(
+        infData, 
+        effData,
+        parameters=['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Nitrogen total', 'Turbidity']
+        )
 
     plt.show()

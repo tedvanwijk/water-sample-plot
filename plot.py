@@ -114,15 +114,6 @@ parameterData = {
     },
 }
 
-colors = {
-    "Influent": "tab:blue",
-    "Effluent": "tab:orange",
-    "Sludge": "tab:green",
-    "Influent ref": "tab:red",
-    "Effluent ref": "tab:purple",
-    "BE ref": "tab:brown"
-}
-
 def checkDataValidity(dataType, parameter, values):
     for value in values:
         if value < 0:
@@ -139,8 +130,7 @@ def checkDataValidity(dataType, parameter, values):
         
     return 'valid'
 
-def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=False, refColors=[], plotLimits=False):
-    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
+def plotAll(dataList, dataListNames, colors=['tab:blue', 'tab:orange', 'tab:green'], avg=True, refData=[], refLabels=[], ref=False, refColors=[], plotLimits=False, parameters=[]):
     limits = ['<1.5', '<0.9', None, None, None, '7-9', '<50', None]
     for iii in range(len(parameters)):
         p = parameters[iii]
@@ -194,11 +184,11 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
                 xdataTotal = np.append(xdataTotal, newXValue)
 
             if len(xdata) != 0:
-                plt.scatter(xdata, ydata, label=dataListNames[ii], c=colors[dataListNames[ii]])
+                plt.scatter(xdata, ydata, label=dataListNames[ii], c=colors[ii])
             if len(xdataOutOfRange) != 0:
-                plt.scatter(xdataOutOfRange, ydataOutOfRange, label=f'{dataListNames[ii]} (out of range)', marker='^', c=colors[dataListNames[ii]])
+                plt.scatter(xdataOutOfRange, ydataOutOfRange, label=f'{dataListNames[ii]} (out of range)', marker='^', c=colors[ii])
             if len(xdataInvalid) != 0:
-                plt.scatter(xdataInvalid, ydataInvalid, label=f'{dataListNames[ii]} (invalid)', marker='x', c=colors[dataListNames[ii]])
+                plt.scatter(xdataInvalid, ydataInvalid, label=f'{dataListNames[ii]} (invalid)', marker='x', c=colors[ii])
         unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
         plt.xlabel('Days since BE startup [-]')
@@ -216,7 +206,7 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
 
         limitValue = limits[iii]
         if limitValue != None and plotLimits:
-            if len(xdataRef) > len(xdataTotal):
+            if len(xdataRef) > 0 and xdataRef[-1] > xdataTotal[-1]:
                 xdataLimit = xdataRef
             else:
                 xdataLimit = xdataTotal
@@ -232,8 +222,7 @@ def plotAll(dataList, dataListNames, avg=True, refData=[], refLabels=[], ref=Fal
         plt.legend()
     return
 
-def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False, refColors=[]):
-    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrogen total', 'Turbidity']
+def plotEff(dataSource, color='tab:orange', avg=True, refData=[], refLabels=[], ref=False, refColors=[], parameters=[]):
     # https://wetten.overheid.nl/BWBR0041313/2024-07-01#BijlageV
     limits = ['<1.5', '<0.9', None, None, None, '7-9', '<50', None]
     for ii in range(len(parameters)):
@@ -287,11 +276,11 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False, refColors
             xdataTotal = np.append(xdataTotal, newXValue)
 
         if len(xdata) != 0:
-            plt.scatter(xdata, ydata, label='Effluent Saxion', c=colors['Effluent'])
+            plt.scatter(xdata, ydata, label='Effluent Saxion', c=color)
         if len(xdataOutOfRange) != 0:
-            plt.scatter(xdataOutOfRange, ydataOutOfRange, label='Effluent Saxion (out of range)', marker='^', c=colors['Effluent'])
+            plt.scatter(xdataOutOfRange, ydataOutOfRange, label='Effluent Saxion (out of range)', marker='^', c=color)
         if len(xdataInvalid) != 0:
-            plt.scatter(xdataInvalid, ydataInvalid, label='Effluent Saxion (invalid)', marker='x', c=colors['Effluent'])
+            plt.scatter(xdataInvalid, ydataInvalid, label='Effluent Saxion (invalid)', marker='x', c=color)
         unit = data[p]['unit']
         plt.ylabel(f'{p} {unit}')
         plt.xlabel('Days since BE startup [-]')
@@ -326,9 +315,7 @@ def plotEff(dataSource, avg=True, refData=[], refLabels=[], ref=False, refColors
 
     return
 
-def plotDiff(infData, effData):
-    # parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Conductivity', 'pH', 'Nitrate total', 'Turbidity']
-    parameters = ['Ammonium', 'Ortho Phosphate', 'COD', 'BOD', 'Nitrogen total', 'Turbidity']
+def plotDiff(infData, effData, parameters=[]):
     dateIndicesInf = infData['Date']["Indices"]
     dateDaysInf = infData['Date']["Days"]
     dateIndicesEff = effData['Date']["Indices"]
